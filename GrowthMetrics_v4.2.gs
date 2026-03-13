@@ -1,7 +1,16 @@
 // ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.3             ║
+// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.4             ║
 // ║  Modern Dark-Mode UI  ·  Real-Time  ·  Auto-Refresh                       ║
 // ╚══════════════════════════════════════════════════════════════════════════════╝
+//
+// v4.4 CHANGE LOG (over v4.3):
+//   • REQUIREMENTS TABLE: Title accent + sparkline bars now both use teal
+//     (#39d2c0) for consistent colour coding
+//   • CLIENTS TABLE: Title accent + sparkline bars now both use violet
+//     (#bc8cff) for consistent colour coding
+//   • CLIENT NAMES: Geo suffixes (e.g. "- US") stripped from names; geo
+//     shown separately as CTA-style token badge (larger font, padded)
+//   • All prior v4.3 fixes preserved
 //
 // v4.3 CHANGE LOG (over v4.2):
 //   • PIPELINE HEALTH: Trimmed to cols B–F (removed empty col G)
@@ -442,16 +451,21 @@ function rightAlign(sh, row, col) {
   sh.getRange(row, col).setHorizontalAlignment("right");
 }
 
-/** Apply geo token styling to a cell */
+/** Strip geo suffix (e.g. " - US", " - AU") from a client name */
+function stripGeo(name) {
+  return String(name).replace(/\s*[-–—]\s*(US|EU|AU|UK|IN|CA|SG|AE)\s*$/i, "").trim();
+}
+
+/** Apply CTA-style geo token to a cell — rounded-look bold badge */
 function geoToken(sh, row, col, geoCode) {
   var code = geoCode ? geoCode.toUpperCase() : "—";
   var colours = GEO_COLOURS[code] || GEO_COLOURS["—"];
   var cell = sh.getRange(row, col);
-  cell.setValue(code)
+  cell.setValue("  " + code + "  ")
       .setBackground(colours.bg)
       .setFontColor(colours.fg)
       .setFontWeight("bold")
-      .setFontSize(9)
+      .setFontSize(10)
       .setHorizontalAlignment("center")
       .setVerticalAlignment("middle");
 }
@@ -674,7 +688,7 @@ function updateGrowthMetrics() {
   // │                       RevShare | AvgR | Demand(2-col merged)            │
   // └─────────────────────────────────────────────────────────────────────────┘
   var reqNCols = 11;
-  secTitle(sh, row, 2, reqNCols, "TOP 10 REQUIREMENTS — Most Opted Creative Requirements", P.gold);
+  secTitle(sh, row, 2, reqNCols, "TOP 10 REQUIREMENTS — Most Opted Creative Requirements", P.teal);
   row++;
   tHead(sh, row, 2, ["#", "Requirement", "Service", "Volume", "Converted", "Revenue", "Conv %", "Rev Share", "Avg Rev/Conv", "Demand", ""]);
   // Merge "Demand" header across 2 columns (K+L)
@@ -704,7 +718,7 @@ function updateGrowthMetrics() {
     ], i);
     leftAlign(sh, row, 3);
     leftAlign(sh, row, 4);
-    sparkBar2(sh, row, 11, A.rA[i].c, maxReqCount, P.azure);  // ← 2 columns wide (K+L)
+    sparkBar2(sh, row, 11, A.rA[i].c, maxReqCount, P.teal);  // ← 2 columns wide (K+L)
     row++;
   }
   // Totals
@@ -834,7 +848,7 @@ function updateGrowthMetrics() {
   // │       AvgR | KeyReqs(2-col merged) | Geo | RevVisual(2-col merged)     │
   // └─────────────────────────────────────────────────────────────────────────┘
   var cliNCols = 12;
-  secTitle(sh, row, 2, cliNCols, "TOP 10 CLIENTS — Revenue, Conversions & Requirements", P.rose);
+  secTitle(sh, row, 2, cliNCols, "TOP 10 CLIENTS — Revenue, Conversions & Requirements", P.violet);
   row++;
   // Header: note "Key Requirements" spans col J, "—" is placeholder for merge into K,
   //         "Geo" at col L, "Revenue Visual" spans cols M (will merge M+… but we use sparkBar2 at L+M)
@@ -853,7 +867,7 @@ function updateGrowthMetrics() {
     var cliShare = pct(dv(A.cA[i].r, A.tR) * 100);
     tRow(sh, row, 2, [
       num(i + 1),
-      A.cA[i].n,
+      stripGeo(A.cA[i].n),
       cur(A.cA[i].r),
       num(A.cA[i].p),
       num(A.cA[i].v),
@@ -876,7 +890,7 @@ function updateGrowthMetrics() {
     geoToken(sh, row, 12, A.cA[i].geo);
 
     // Revenue visual sparkline in col 13 (single column — at the edge)
-    sparkBar(sh, row, 13, A.cA[i].r, maxCliRev, P.rose);
+    sparkBar(sh, row, 13, A.cA[i].r, maxCliRev, P.violet);
     row++;
   }
   // Merge the header cells for "Key Requirements" too (cols 10+11)
