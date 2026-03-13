@@ -1,7 +1,17 @@
 // ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.5             ║
+// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.6             ║
 // ║  Modern Dark-Mode UI  ·  Real-Time  ·  Auto-Refresh                       ║
 // ╚══════════════════════════════════════════════════════════════════════════════╝
+//
+// v4.6 CHANGE LOG (over v4.5):
+//   • KPI TITLES: Label colour now matches each card's accent line
+//   • KPI ACCENT ROWS: Height equalised (5px → 6px) for rows 8 & 12
+//   • GEO TOKENS: US → brighter blue, EU → red, AU → yellow
+//   • HEADER: Row 1 accent → #58a6ff, Row 2 title bg → #073763
+//   • FOOTER: Divider colour changed from gold to match section dividers
+//   • REQUIREMENTS TABLE: Service column (D) now center-aligned
+//   • EM-DASH: All display "—" replaced with "-"
+//   • All prior v4.5 fixes preserved
 //
 // v4.5 CHANGE LOG (over v4.4):
 //   • REQUIREMENTS TABLE: Accent colour changed from #ff6d01 → #ff7b60
@@ -100,15 +110,15 @@ var P = {
 
 // ─── GEO COLOUR MAP ─────────────────────────────────────────────────────────
 var GEO_COLOURS = {
-  "US"  : {bg: "#1f3a5f", fg: "#58a6ff"},   // blue token
-  "EU"  : {bg: "#2d1f5e", fg: "#bc8cff"},   // violet token
-  "AU"  : {bg: "#1a3d2e", fg: "#3fb950"},   // green token
+  "US"  : {bg: "#1a4070", fg: "#6cb6ff"},   // bright blue token
+  "EU"  : {bg: "#4a1a1a", fg: "#ff6b6b"},   // bright red token
+  "AU"  : {bg: "#3d3520", fg: "#ffd54f"},   // bright yellow token
   "UK"  : {bg: "#3d2b1a", fg: "#f0b429"},   // gold token
   "IN"  : {bg: "#3d1a2b", fg: "#ff7eb3"},   // rose token
   "CA"  : {bg: "#1a3d3d", fg: "#39d2c0"},   // teal token
   "SG"  : {bg: "#3d3a1a", fg: "#d29922"},   // amber token
   "AE"  : {bg: "#3d1a1a", fg: "#f85149"},   // coral token
-  "—"   : {bg: "#21293a", fg: "#6e7681"}    // default/unknown
+  "-"   : {bg: "#21293a", fg: "#6e7681"}    // default/unknown
 };
 
 // ─── LAYOUT SYSTEM ───────────────────────────────────────────────────────────
@@ -143,7 +153,7 @@ var L = {
   hTotalsRow : 34,
   hKpiLabel  : 42,
   hKpiValue  : 54,
-  hKpiAccent : 5,
+  hKpiAccent : 6,
   hFooter    : 28,
   // Font sizes
   fTitle     : 24,
@@ -262,7 +272,7 @@ function analyse(data) {
   for (var k in cM) {
     // Determine primary geo (most frequent)
     var geoKeys = Object.keys(cM[k].geo);
-    var primaryGeo = "—";
+    var primaryGeo = "-";
     var maxGeoCount = 0;
     for (var g = 0; g < geoKeys.length; g++) {
       if (cM[k].geo[geoKeys[g]] > maxGeoCount) {
@@ -479,8 +489,8 @@ function stripGeo(name) {
 
 /** Apply CTA-style geo token to a cell — rounded-look bold badge */
 function geoToken(sh, row, col, geoCode) {
-  var code = geoCode ? geoCode.toUpperCase() : "—";
-  var colours = GEO_COLOURS[code] || GEO_COLOURS["—"];
+  var code = geoCode ? geoCode.toUpperCase() : "-";
+  var colours = GEO_COLOURS[code] || GEO_COLOURS["-"];
   var cell = sh.getRange(row, col);
   cell.setValue("  " + code + "  ")
       .setBackground(colours.bg)
@@ -498,7 +508,7 @@ function kpiCard(sh, accentRow, labelRow, valueRow, cStart, cSpan, accent, label
   sh.getRange(accentRow, cStart, 1, cSpan).merge().setBackground(accent);
   sh.getRange(labelRow, cStart, 1, cSpan).merge()
     .setValue(label)
-    .setBackground(P.bg1).setFontColor(P.tx2)
+    .setBackground(P.bg1).setFontColor(accent)
     .setFontSize(L.fKpiLabel).setFontWeight("bold")
     .setHorizontalAlignment("center").setVerticalAlignment("bottom");
   sh.getRange(valueRow, cStart, 1, cSpan).merge()
@@ -531,9 +541,10 @@ function updateGrowthMetrics() {
   // ┌─────────────────────────────────────────────────────────────────────────┐
   // │  HEADER BANNER                                                         │
   // └─────────────────────────────────────────────────────────────────────────┘
-  accentDiv(sh, row, P.gold);
+  accentDiv(sh, row, "#58a6ff");
   row++;
   darkRow(sh, row, "P2P  GROWTH  METRICS  2026", P.tx0, L.fTitle, "bold", L.hTitle);
+  sh.getRange(row, 1, 1, L.totalCols).setBackground("#073763");
   row++;
   darkRow(sh, row, "Global Revenue  ·  Growth Analytics  ·  Creative Services  ·  Real-Time Report", P.totalsYellow, L.fSubtitle, "bold", L.hSubtitle);
   row++;
@@ -546,7 +557,7 @@ function updateGrowthMetrics() {
   // ┌─────────────────────────────────────────────────────────────────────────┐
   // │  KPI SCORECARDS — Row 1                                                │
   // └─────────────────────────────────────────────────────────────────────────┘
-  darkRow(sh, row, "—  KEY PERFORMANCE INDICATORS  —", P.totalsYellow, L.fSection, "bold", L.hSection);
+  darkRow(sh, row, "-  KEY PERFORMANCE INDICATORS  -", P.totalsYellow, L.fSection, "bold", L.hSection);
   row++;
   spacer(sh, row); row++;
 
@@ -560,7 +571,7 @@ function updateGrowthMetrics() {
   kpiCard(sh, k1a, k1l, k1v, 8,  2, P.gold,      "TOTAL REVENUE",   cur(A.tR));
   kpiCard(sh, k1a, k1l, k1v, 10, 1, P.kpiOrange, "AVG DEAL SIZE",   cur(A.ad));
   kpiCard(sh, k1a, k1l, k1v, 11, 2, P.kpiTeal,   "ANNUALISED REV",  cur(A.ar));
-  kpiCard(sh, k1a, k1l, k1v, 13, 1, P.kpiRose,   "TOP SERVICE",     A.sA.length > 0 ? A.sA[0].n : "—");
+  kpiCard(sh, k1a, k1l, k1v, 13, 1, P.kpiRose,   "TOP SERVICE",     A.sA.length > 0 ? A.sA[0].n : "-");
 
   spacer(sh, row); row++;
 
@@ -578,7 +589,7 @@ function updateGrowthMetrics() {
                                                  "CONCENTRATION RISK", pct(A.conc));
   kpiCard(sh, k2a, k2l, k2v, 10, 1, P.emerald, "VELOCITY / MO",      dec(A.vel));
   kpiCard(sh, k2a, k2l, k2v, 11, 2, P.azure,   "SQLs / MONTH",       dec(A.sqlV));
-  kpiCard(sh, k2a, k2l, k2v, 13, 1, P.rose,    "TOP REQUIREMENT",    A.rA.length > 0 ? A.rA[0].n : "—");
+  kpiCard(sh, k2a, k2l, k2v, 13, 1, P.rose,    "TOP REQUIREMENT",    A.rA.length > 0 ? A.rA[0].n : "-");
 
   spacer(sh, row); row++;
   accentDiv(sh, row, P.borderDk); row++;
@@ -738,7 +749,6 @@ function updateGrowthMetrics() {
       "", ""           // Demand sparkline (2-col merged)
     ], i);
     leftAlign(sh, row, 3);
-    leftAlign(sh, row, 4);
     sparkBar2(sh, row, 11, A.rA[i].c, maxReqCount, P.orange);  // ← 2 columns wide (K+L)
     row++;
   }
@@ -784,7 +794,7 @@ function updateGrowthMetrics() {
   for (var i = 0; i < A.mA.length; i++) { if (A.mA[i].r > maxMoRev) maxMoRev = A.mA[i].r; }
 
   for (var i = 0; i < A.mA.length; i++) {
-    var mom    = "—";
+    var mom    = "-";
     var momVal = 0;
     if (i > 0 && prevRev > 0) {
       momVal = ((A.mA[i].r - prevRev) / prevRev) * 100;
@@ -804,7 +814,7 @@ function updateGrowthMetrics() {
       "", ""           // Momentum sparkline (2-col merged)
     ], i);
     sparkBar2(sh, row, 10, A.mA[i].r, maxMoRev, P.emerald);  // ← 2 columns wide (J+K)
-    if (mom !== "—") tintCell(sh, row, 8, momVal);
+    if (mom !== "-") tintCell(sh, row, 8, momVal);
     row++;
   }
   // Totals
@@ -814,7 +824,7 @@ function updateGrowthMetrics() {
     "TOTAL", num(mTq), num(mTv),
     pct(dv(mTv, mTq) * 100),
     cur(mTr), cur(dv(mTr, mTv)),
-    "—", cur(mTr), "", ""
+    "-", cur(mTr), "", ""
   ], P.emerald);
   row++;
   gBorder(sh, moStart - 1, 2, row - moStart + 1, moNCols);
@@ -937,7 +947,7 @@ function updateGrowthMetrics() {
   // ┌─────────────────────────────────────────────────────────────────────────┐
   // │  FOOTER                                                                │
   // └─────────────────────────────────────────────────────────────────────────┘
-  accentDiv(sh, row, P.gold); row++;
+  accentDiv(sh, row, P.borderDk); row++;
 
   // ── Final global formatting ──
   sh.getRange(1, 1, row, L.totalCols).setFontFamily(FONT);
