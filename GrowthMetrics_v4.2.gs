@@ -8,8 +8,10 @@
 //     (#39d2c0) for consistent colour coding
 //   • CLIENTS TABLE: Title accent + sparkline bars now both use violet
 //     (#bc8cff) for consistent colour coding
-//   • CLIENT NAMES: Geo suffixes (e.g. "- US") stripped from names; geo
-//     shown separately as CTA-style token badge (larger font, padded)
+//   • GEO COLUMN FIX: extractGeo() now parses "NITISHA - US" → "US" at
+//     the data layer so the Geo column shows only the 2-letter code as
+//     a CTA-style colour-coded token badge (font 10, padded)
+//   • CLIENT NAMES: Geo suffixes (e.g. "- US") stripped from display names
 //   • All prior v4.3 fixes preserved
 //
 // v4.3 CHANGE LOG (over v4.2):
@@ -172,7 +174,7 @@ function collectAllData() {
       var sts = clean(v[COL_STATUS - 1]);
       var cst = parseFloat(v[COL_COST - 1]) || 0;
       var ctp = clean(v[COL_CLIENT_TYPE - 1]);
-      var geo = clean(v[COL_GEO - 1]);
+      var geo = extractGeo(clean(v[COL_GEO - 1]));
       if (!svc && !req && !dom) continue;
       if (isDrop(svc)) svc = "";
       if (isDrop(req)) req = "";
@@ -193,6 +195,15 @@ function collectAllData() {
 // ─── Value Formatters ────────────────────────────────────────────────────────
 function clean(v)  { return String(v || "").trim(); }
 function isDrop(v) { return v.toLowerCase().indexOf("select") !== -1; }
+/** Extract geo code from strings like "NITISHA - US" → "US" */
+function extractGeo(v) {
+  var m = v.match(/[-–—]\s*(US|EU|AU|UK|IN|CA|SG|AE)\s*$/i);
+  if (m) return m[1].toUpperCase();
+  var u = v.toUpperCase();
+  var codes = ["US","EU","AU","UK","IN","CA","SG","AE"];
+  for (var i = 0; i < codes.length; i++) { if (u === codes[i]) return codes[i]; }
+  return v;
+}
 function num(n)    { return String(Math.round(n)); }
 function cur(n)    { return "$" + Math.round(n).toLocaleString("en-US"); }
 function pct(n)    { return n.toFixed(1) + "%"; }
