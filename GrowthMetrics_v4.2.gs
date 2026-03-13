@@ -1,7 +1,16 @@
 // ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.2             ║
+// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.3             ║
 // ║  Modern Dark-Mode UI  ·  Real-Time  ·  Auto-Refresh                       ║
 // ╚══════════════════════════════════════════════════════════════════════════════╝
+//
+// v4.3 CHANGE LOG (over v4.2):
+//   • PIPELINE HEALTH: Trimmed to cols B–F (removed empty col G)
+//   • SERVICE FREQUENCY & MONTHLY REVENUE: Trimmed to 10 cols (removed
+//     trailing blank col L)
+//   • SPARKLINE HEADERS: "Demand", "Momentum", "Visual" titles now merged
+//     across their 2-column sparkline span for visual consistency
+//   • TITLE COLOURS: Subtitle & KPI heading changed to #FFDD2F
+//   • All prior v4.2 fixes preserved
 //
 // v4.2 CHANGE LOG (over v4.1):
 //   • SPARKLINES: All horizontal bar charts now span 2 columns (merged) for
@@ -491,7 +500,7 @@ function updateGrowthMetrics() {
   row++;
   darkRow(sh, row, "P2P  GROWTH  METRICS  2026", P.tx0, L.fTitle, "bold", L.hTitle);
   row++;
-  darkRow(sh, row, "Global Revenue  ·  Growth Analytics  ·  Creative Services  ·  Real-Time Report", P.gold, L.fSubtitle, "normal", L.hSubtitle);
+  darkRow(sh, row, "Global Revenue  ·  Growth Analytics  ·  Creative Services  ·  Real-Time Report", P.totalsYellow, L.fSubtitle, "normal", L.hSubtitle);
   row++;
   var ts = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd MMM yyyy  'at'  HH:mm:ss");
   darkRow(sh, row, "Last Synced : " + ts, P.tx3, L.fTimestamp, "normal", L.hTimestamp, "italic");
@@ -502,7 +511,7 @@ function updateGrowthMetrics() {
   // ┌─────────────────────────────────────────────────────────────────────────┐
   // │  KPI SCORECARDS — Row 1                                                │
   // └─────────────────────────────────────────────────────────────────────────┘
-  darkRow(sh, row, "—  KEY PERFORMANCE INDICATORS  —", P.gold, L.fSection, "bold", L.hSection);
+  darkRow(sh, row, "—  KEY PERFORMANCE INDICATORS  —", P.totalsYellow, L.fSection, "bold", L.hSection);
   row++;
   spacer(sh, row); row++;
 
@@ -543,14 +552,20 @@ function updateGrowthMetrics() {
   // ┌─────────────────────────────────────────────────────────────────────────┐
   // │  PIPELINE HEALTH  +  NBD vs EXISTING  (side by side)                   │
   // └─────────────────────────────────────────────────────────────────────────┘
-  // Pipeline: cols 2–7 (6 cols: Status, Count, Share, Visual×2, blank absorbed)
+  // Pipeline: cols 2–6 (5 cols: Status, Count, Share, Visual×2)
   // NBD:      cols 8–13 (6 cols)
-  secTitle(sh, row, 2, 6, "PIPELINE HEALTH", P.teal);
+  secTitle(sh, row, 2, 5, "PIPELINE HEALTH", P.teal);
   secTitle(sh, row, 8, 6, "NEW BUSINESS vs EXISTING", P.violet);
   row++;
 
   // Pipeline header: Status | Count | Share | Visual (2 cols merged in sparkline)
-  tHead(sh, row, 2, ["Status", "Count", "Share", "Visual", "", ""]);
+  tHead(sh, row, 2, ["Status", "Count", "Share", "Visual", ""]);
+  // Merge "Visual" header across 2 columns (E+F)
+  sh.getRange(row, 5, 1, 2).merge()
+    .setValue("Visual")
+    .setHorizontalAlignment("center").setVerticalAlignment("middle")
+    .setBackground(P.bg0).setFontColor(P.tx2)
+    .setFontSize(L.fTableHead).setFontWeight("bold");
   tHead(sh, row, 8, ["Segment", "SQLs", "Converted", "Revenue", "Conv. Rate", "Rev Share"]);
   row++;
 
@@ -563,15 +578,15 @@ function updateGrowthMetrics() {
   var pStart = row;
   for (var pi = 0; pi < pItems.length; pi++) {
     var share = dv(pItems[pi].v, A.tQ) * 100;
-    tRow(sh, row, 2, [pItems[pi].l, num(pItems[pi].v), pct(share), "", "", ""], pi);
+    tRow(sh, row, 2, [pItems[pi].l, num(pItems[pi].v), pct(share), "", ""], pi);
     leftAlign(sh, row, 2);
     sh.getRange(row, 2).setFontColor(pItems[pi].clr);
-    sparkBar2(sh, row, 5, pItems[pi].v, A.tQ, pItems[pi].clr);  // ← 2 columns wide
+    sparkBar2(sh, row, 5, pItems[pi].v, A.tQ, pItems[pi].clr);  // ← 2 columns wide (E+F)
     row++;
   }
-  tTotal(sh, row, 2, ["TOTAL", num(A.tQ), "100.0%", "", "", ""]);
+  tTotal(sh, row, 2, ["TOTAL", num(A.tQ), "100.0%", "", ""]);
   row++;
-  gBorder(sh, pStart - 1, 2, row - pStart + 1, 6);
+  gBorder(sh, pStart - 1, 2, row - pStart + 1, 5);
 
   // ── NBD vs Existing (right) ──
   var nRow  = pStart;
@@ -605,10 +620,16 @@ function updateGrowthMetrics() {
   // │  SERVICE FREQUENCY RANKING                                             │
   // │  Cols B–J = 9 data cols + K–L for 2-col sparkline = 11 total           │
   // └─────────────────────────────────────────────────────────────────────────┘
-  var svcNCols = 11;  // B(#) C(Name) D(Vol) E(Conv) F(Conv%) G(Rev) H(RevShare) I(AvgR) J+K(Demand sparkline 2-col)
+  var svcNCols = 10;  // B(#) C(Name) D(Vol) E(Conv) F(Conv%) G(Rev) H(RevShare) I(AvgR) J+K(Demand sparkline 2-col)
   secTitle(sh, row, 2, svcNCols, "SERVICE FREQUENCY RANKING", P.azure);
   row++;
-  tHead(sh, row, 2, ["#", "Service", "Volume", "Converted", "Conv %", "Revenue", "Rev Share", "Avg Rev/Conv", "Demand", "", ""]);
+  tHead(sh, row, 2, ["#", "Service", "Volume", "Converted", "Conv %", "Revenue", "Rev Share", "Avg Rev/Conv", "Demand", ""]);
+  // Merge "Demand" header across 2 columns (J+K)
+  sh.getRange(row, 10, 1, 2).merge()
+    .setValue("Demand")
+    .setHorizontalAlignment("center").setVerticalAlignment("middle")
+    .setBackground(P.bg0).setFontColor(P.tx2)
+    .setFontSize(L.fTableHead).setFontWeight("bold");
   row++;
 
   var svcStart    = row;
@@ -625,7 +646,7 @@ function updateGrowthMetrics() {
       cur(A.sA[i].r),
       svcRevShare,
       svcAvgRev,
-      "", "", ""        // Demand sparkline cols (2 merged) + 1 blank
+      "", ""            // Demand sparkline cols (2 merged)
     ], i);
     leftAlign(sh, row, 3);
     sparkBar2(sh, row, 10, A.sA[i].c, maxSvcCount, P.azure);  // ← 2 columns wide (J+K)
@@ -638,7 +659,7 @@ function updateGrowthMetrics() {
     "", "TOTAL", num(sTc), num(sTv),
     pct(dv(sTv, sTc) * 100), cur(sTr),
     "100.0%", sTv > 0 ? cur(sTr / sTv) : "$0",
-    "", "", ""
+    "", ""
   ]);
   row++;
   gBorder(sh, svcStart - 1, 2, row - svcStart + 1, svcNCols);
@@ -656,6 +677,12 @@ function updateGrowthMetrics() {
   secTitle(sh, row, 2, reqNCols, "TOP 10 REQUIREMENTS — Most Opted Creative Requirements", P.gold);
   row++;
   tHead(sh, row, 2, ["#", "Requirement", "Service", "Volume", "Converted", "Revenue", "Conv %", "Rev Share", "Avg Rev/Conv", "Demand", ""]);
+  // Merge "Demand" header across 2 columns (K+L)
+  sh.getRange(row, 11, 1, 2).merge()
+    .setValue("Demand")
+    .setHorizontalAlignment("center").setVerticalAlignment("middle")
+    .setBackground(P.bg0).setFontColor(P.tx2)
+    .setFontSize(L.fTableHead).setFontWeight("bold");
   row++;
 
   var rqStart     = row;
@@ -703,10 +730,16 @@ function updateGrowthMetrics() {
   // │  Cols B–L = 11: Month | SQLs | Conv | Conv% | Rev | AvgDeal |          │
   // │                 MoM | Cumulative | Momentum(2-col merged)               │
   // └─────────────────────────────────────────────────────────────────────────┘
-  var moNCols = 11;
+  var moNCols = 10;
   secTitle(sh, row, 2, moNCols, "MONTHLY REVENUE & PERFORMANCE TRENDS", P.emerald);
   row++;
-  tHead(sh, row, 2, ["Month", "SQLs", "Converted", "Conv %", "Revenue", "Avg Deal", "MoM Growth", "Cumulative", "Momentum", "", ""]);
+  tHead(sh, row, 2, ["Month", "SQLs", "Converted", "Conv %", "Revenue", "Avg Deal", "MoM Growth", "Cumulative", "Momentum", ""]);
+  // Merge "Momentum" header across 2 columns (J+K)
+  sh.getRange(row, 10, 1, 2).merge()
+    .setValue("Momentum")
+    .setHorizontalAlignment("center").setVerticalAlignment("middle")
+    .setBackground(P.bg0).setFontColor(P.tx2)
+    .setFontSize(L.fTableHead).setFontWeight("bold");
   row++;
 
   var moStart  = row;
@@ -733,7 +766,7 @@ function updateGrowthMetrics() {
       cur(A.mA[i].avg),
       mom,
       cur(cumRev),
-      "", "", ""       // Momentum sparkline (2-col merged)
+      "", ""           // Momentum sparkline (2-col merged)
     ], i);
     sparkBar2(sh, row, 10, A.mA[i].r, maxMoRev, P.emerald);  // ← 2 columns wide (J+K)
     if (mom !== "—") tintCell(sh, row, 8, momVal);
@@ -746,7 +779,7 @@ function updateGrowthMetrics() {
     "TOTAL", num(mTq), num(mTv),
     pct(dv(mTv, mTq) * 100),
     cur(mTr), cur(dv(mTr, mTv)),
-    "—", cur(mTr), "", "", ""
+    "—", cur(mTr), "", ""
   ]);
   row++;
   gBorder(sh, moStart - 1, 2, row - moStart + 1, moNCols);
