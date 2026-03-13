@@ -4,14 +4,12 @@
 // ╚══════════════════════════════════════════════════════════════════════════════╝
 //
 // v4.4 CHANGE LOG (over v4.3):
-//   • REQUIREMENTS TABLE: Title accent + sparkline bars now both use teal
-//     (#39d2c0) for consistent colour coding
-//   • CLIENTS TABLE: Title accent + sparkline bars now both use violet
-//     (#bc8cff) for consistent colour coding
-//   • GEO COLUMN FIX: extractGeo() now parses "NITISHA - US" → "US" at
-//     the data layer so the Geo column shows only the 2-letter code as
-//     a CTA-style colour-coded token badge (font 10, padded)
-//   • CLIENT NAMES: Geo suffixes (e.g. "- US") stripped from display names
+//   • REQUIREMENTS TABLE: Title accent + sparkline bars → orange (#ff6d01)
+//   • CLIENTS TABLE: Title accent + sparkline bars → lemon-yellow (#f7ff65)
+//   • TOTALS ROWS: Text + border colour → lemon-yellow (#f7ff65)
+//   • PIPELINE LEGEND: "● Lost / Closed" shortened to "● Lost"
+//   • GEO COLUMN FIX: extractGeo() parses "NITISHA - US" → "US"
+//   • CLIENT NAMES: Geo suffixes stripped from display names
 //   • All prior v4.3 fixes preserved
 //
 // v4.3 CHANGE LOG (over v4.2):
@@ -71,9 +69,11 @@ var P = {
   violet    : "#bc8cff",
   amber     : "#d29922",
   teal      : "#39d2c0",
+  orange    : "#ff6d01",
+  lemonYel  : "#f7ff65",
   rose      : "#ff7eb3",
   // Totals row colour — CHANGED from gold to yellow
-  totalsYellow : "#FFDD2F",
+  totalsYellow : "#f7ff65",
   // KPI Card Top-Edge
   kpiBlue   : "#1f6feb",
   kpiGreen  : "#238636",
@@ -404,7 +404,7 @@ function tRow(sh, row, cS, vals, idx, fw) {
   return r;
 }
 
-/** Totals row — YELLOW accent (#FFDD2F) */
+/** Totals row — LEMON-YELLOW accent (#f7ff65) */
 function tTotal(sh, row, cS, vals) {
   var r = sh.getRange(row, cS, 1, vals.length);
   r.setValues([vals])
@@ -597,7 +597,7 @@ function updateGrowthMetrics() {
   // ── Pipeline (left) ──
   var pItems = [
     {l: "● Converted",         v: A.pipe.conv,  clr: P.emerald},
-    {l: "● Lost / Closed",     v: A.pipe.lost,  clr: P.coral},
+    {l: "● Lost",              v: A.pipe.lost,  clr: P.coral},
     {l: "● Other",             v: A.pipe.other, clr: P.tx3}
   ];
   var pStart = row;
@@ -699,7 +699,7 @@ function updateGrowthMetrics() {
   // │                       RevShare | AvgR | Demand(2-col merged)            │
   // └─────────────────────────────────────────────────────────────────────────┘
   var reqNCols = 11;
-  secTitle(sh, row, 2, reqNCols, "TOP 10 REQUIREMENTS — Most Opted Creative Requirements", P.teal);
+  secTitle(sh, row, 2, reqNCols, "TOP 10 REQUIREMENTS — Most Opted Creative Requirements", P.orange);
   row++;
   tHead(sh, row, 2, ["#", "Requirement", "Service", "Volume", "Converted", "Revenue", "Conv %", "Rev Share", "Avg Rev/Conv", "Demand", ""]);
   // Merge "Demand" header across 2 columns (K+L)
@@ -729,7 +729,7 @@ function updateGrowthMetrics() {
     ], i);
     leftAlign(sh, row, 3);
     leftAlign(sh, row, 4);
-    sparkBar2(sh, row, 11, A.rA[i].c, maxReqCount, P.teal);  // ← 2 columns wide (K+L)
+    sparkBar2(sh, row, 11, A.rA[i].c, maxReqCount, P.orange);  // ← 2 columns wide (K+L)
     row++;
   }
   // Totals
@@ -859,7 +859,7 @@ function updateGrowthMetrics() {
   // │       AvgR | KeyReqs(2-col merged) | Geo | RevVisual(2-col merged)     │
   // └─────────────────────────────────────────────────────────────────────────┘
   var cliNCols = 12;
-  secTitle(sh, row, 2, cliNCols, "TOP 10 CLIENTS — Revenue, Conversions & Requirements", P.violet);
+  secTitle(sh, row, 2, cliNCols, "TOP 10 CLIENTS — Revenue, Conversions & Requirements", P.lemonYel);
   row++;
   // Header: note "Key Requirements" spans col J, "—" is placeholder for merge into K,
   //         "Geo" at col L, "Revenue Visual" spans cols M (will merge M+… but we use sparkBar2 at L+M)
@@ -901,7 +901,7 @@ function updateGrowthMetrics() {
     geoToken(sh, row, 12, A.cA[i].geo);
 
     // Revenue visual sparkline in col 13 (single column — at the edge)
-    sparkBar(sh, row, 13, A.cA[i].r, maxCliRev, P.violet);
+    sparkBar(sh, row, 13, A.cA[i].r, maxCliRev, P.lemonYel);
     row++;
   }
   // Merge the header cells for "Key Requirements" too (cols 10+11)
