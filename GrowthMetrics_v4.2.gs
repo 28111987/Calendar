@@ -1,7 +1,16 @@
 // ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.4             ║
+// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.5             ║
 // ║  Modern Dark-Mode UI  ·  Real-Time  ·  Auto-Refresh                       ║
 // ╚══════════════════════════════════════════════════════════════════════════════╝
+//
+// v4.5 CHANGE LOG (over v4.4):
+//   • REQUIREMENTS TABLE: Accent colour changed from #ff6d01 → #ff7b60
+//   • TOTALS ROWS: Text + border colour now matches each table's own accent
+//     (Pipeline→teal, NBD→violet, Service→azure, Requirements→#ff7b60,
+//      Monthly→emerald, Clients→lemon-yellow)
+//   • TOTALS FONT: Increased from 10px → 12px
+//   • HEADER: Subtitle + timestamp lines now bold, italic removed from timestamp
+//   • All prior v4.4 fixes preserved
 //
 // v4.4 CHANGE LOG (over v4.3):
 //   • REQUIREMENTS TABLE: Title accent + sparkline bars → orange (#ff6d01)
@@ -69,7 +78,7 @@ var P = {
   violet    : "#bc8cff",
   amber     : "#d29922",
   teal      : "#39d2c0",
-  orange    : "#ff6d01",
+  orange    : "#ff7b60",
   lemonYel  : "#f7ff65",
   rose      : "#ff7eb3",
   // Totals row colour — CHANGED from gold to yellow
@@ -145,7 +154,7 @@ var L = {
   fTableBody : 10,
   fKpiLabel  : 9,
   fKpiValue  : 17,
-  fTotals    : 10,
+  fTotals    : 12,
   fFooter    : 8
 };
 var BORDER = SpreadsheetApp.BorderStyle.SOLID;
@@ -404,16 +413,17 @@ function tRow(sh, row, cS, vals, idx, fw) {
   return r;
 }
 
-/** Totals row — LEMON-YELLOW accent (#f7ff65) */
-function tTotal(sh, row, cS, vals) {
+/** Totals row — accent colour matches the parent table */
+function tTotal(sh, row, cS, vals, accent) {
+  accent = accent || P.totalsYellow;
   var r = sh.getRange(row, cS, 1, vals.length);
   r.setValues([vals])
-   .setBackground(P.totalsBg).setFontColor(P.totalsYellow)   // ← CHANGED to yellow
+   .setBackground(P.totalsBg).setFontColor(accent)
    .setFontSize(L.fTotals).setFontWeight("bold")
    .setHorizontalAlignment("center").setVerticalAlignment("middle")
    .setWrapStrategy(CLIP);
   sh.setRowHeight(row, L.hTotalsRow);
-  r.setBorder(true, false, false, false, false, false, P.totalsYellow, BORDER);   // ← yellow border
+  r.setBorder(true, false, false, false, false, false, accent, BORDER);
   return r;
 }
 
@@ -525,10 +535,10 @@ function updateGrowthMetrics() {
   row++;
   darkRow(sh, row, "P2P  GROWTH  METRICS  2026", P.tx0, L.fTitle, "bold", L.hTitle);
   row++;
-  darkRow(sh, row, "Global Revenue  ·  Growth Analytics  ·  Creative Services  ·  Real-Time Report", P.totalsYellow, L.fSubtitle, "normal", L.hSubtitle);
+  darkRow(sh, row, "Global Revenue  ·  Growth Analytics  ·  Creative Services  ·  Real-Time Report", P.totalsYellow, L.fSubtitle, "bold", L.hSubtitle);
   row++;
   var ts = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd MMM yyyy  'at'  HH:mm:ss");
-  darkRow(sh, row, "Last Synced : " + ts, P.tx3, L.fTimestamp, "normal", L.hTimestamp, "italic");
+  darkRow(sh, row, "Last Synced : " + ts, P.tx3, L.fTimestamp, "bold", L.hTimestamp);
   row++;
   spacer(sh, row); row++;
   sh.getRange(1, 1, row - 1, L.totalCols).setBorder(false, false, false, false, false, false);
@@ -609,7 +619,7 @@ function updateGrowthMetrics() {
     sparkBar2(sh, row, 5, pItems[pi].v, A.tQ, pItems[pi].clr);  // ← 2 columns wide (E+F)
     row++;
   }
-  tTotal(sh, row, 2, ["TOTAL", num(A.tQ), "100.0%", "", ""]);
+  tTotal(sh, row, 2, ["TOTAL", num(A.tQ), "100.0%", "", ""], P.teal);
   row++;
   gBorder(sh, pStart - 1, 2, row - pStart + 1, 5);
 
@@ -632,7 +642,7 @@ function updateGrowthMetrics() {
   }
   var nTC = A.nbe["NBD"].c + A.nbe["Existing"].c;
   var nTV = A.nbe["NBD"].v + A.nbe["Existing"].v;
-  tTotal(sh, nRow, 8, ["TOTAL", num(nTC), num(nTV), cur(tNR), pct(dv(nTV, nTC) * 100), "100.0%"]);
+  tTotal(sh, nRow, 8, ["TOTAL", num(nTC), num(nTV), cur(tNR), pct(dv(nTV, nTC) * 100), "100.0%"], P.violet);
   nRow++;
   gBorder(sh, pStart - 1, 8, nRow - pStart + 1, 6);
 
@@ -685,7 +695,7 @@ function updateGrowthMetrics() {
     pct(dv(sTv, sTc) * 100), cur(sTr),
     "100.0%", sTv > 0 ? cur(sTr / sTv) : "$0",
     "", ""
-  ]);
+  ], P.azure);
   row++;
   gBorder(sh, svcStart - 1, 2, row - svcStart + 1, svcNCols);
 
@@ -742,7 +752,7 @@ function updateGrowthMetrics() {
     pct(dv(rTr, A.tR) * 100),
     rTv > 0 ? cur(rTr / rTv) : "$0",
     "", ""
-  ]);
+  ], P.orange);
   row++;
   gBorder(sh, rqStart - 1, 2, row - rqStart + 1, reqNCols);
 
@@ -805,7 +815,7 @@ function updateGrowthMetrics() {
     pct(dv(mTv, mTq) * 100),
     cur(mTr), cur(dv(mTr, mTv)),
     "—", cur(mTr), "", ""
-  ]);
+  ], P.emerald);
   row++;
   gBorder(sh, moStart - 1, 2, row - moStart + 1, moNCols);
 
@@ -918,7 +928,7 @@ function updateGrowthMetrics() {
     pct(dv(cTr, A.tR) * 100),
     cTv > 0 ? cur(cTr / cTv) : "$0",
     "", "", "", ""
-  ]);
+  ], P.lemonYel);
   row++;
   gBorder(sh, cdStart - 1, 2, row - cdStart + 1, cliNCols);
 
