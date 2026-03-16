@@ -1,7 +1,20 @@
 // ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  P2P GROWTH METRICS DASHBOARD — Premium Analytics Engine v4.6             ║
+// ║  P2P GROWTH METRICS DASHBOARD - Premium Analytics Engine v4.7             ║
 // ║  Modern Dark-Mode UI  ·  Real-Time  ·  Auto-Refresh                       ║
 // ╚══════════════════════════════════════════════════════════════════════════════╝
+//
+// v4.7 CHANGE LOG (over v4.6):
+//   • TITLE: Font size increased to 34px
+//   • SUBTITLE: Updated text + colour → #a4c2f4
+//   • KPI HEADING: "BUSINESS PERFORMANCE INDICATORS" + colour → #39d2c0
+//   • REQUIREMENTS TABLE: Accent changed to rose (#ff7eb3)
+//   • KPI LAYOUT: CONV.RATE & TOTAL SERVICES now span 2 cols (fills G gap)
+//   • KPI LABELS: Muted grey-blue (#8899aa) for less-colourful titles
+//   • VELOCITY / MO: Accent changed from emerald → amber
+//   • TIMESTAMP: 12-hour format, no seconds, IST timezone
+//   • NBD/EXISTING: Segment names center-aligned
+//   • EM-DASH: All remaining "—" in table titles → "-"
+//   • All prior v4.6 fixes preserved
 //
 // v4.6 CHANGE LOG (over v4.5):
 //   • KPI TITLES: Label colour now matches each card's accent line
@@ -156,7 +169,7 @@ var L = {
   hKpiAccent : 6,
   hFooter    : 28,
   // Font sizes
-  fTitle     : 24,
+  fTitle     : 34,
   fSubtitle  : 11,
   fTimestamp : 9,
   fSection   : 12,
@@ -508,7 +521,7 @@ function kpiCard(sh, accentRow, labelRow, valueRow, cStart, cSpan, accent, label
   sh.getRange(accentRow, cStart, 1, cSpan).merge().setBackground(accent);
   sh.getRange(labelRow, cStart, 1, cSpan).merge()
     .setValue(label)
-    .setBackground(P.bg1).setFontColor(accent)
+    .setBackground(P.bg1).setFontColor("#8899aa")
     .setFontSize(L.fKpiLabel).setFontWeight("bold")
     .setHorizontalAlignment("center").setVerticalAlignment("bottom");
   sh.getRange(valueRow, cStart, 1, cSpan).merge()
@@ -546,9 +559,9 @@ function updateGrowthMetrics() {
   darkRow(sh, row, "P2P  GROWTH  METRICS  2026", P.tx0, L.fTitle, "bold", L.hTitle);
   sh.getRange(row, 1, 1, L.totalCols).setBackground("#073763");
   row++;
-  darkRow(sh, row, "Global Revenue  ·  Growth Analytics  ·  Creative Services  ·  Real-Time Report", P.totalsYellow, L.fSubtitle, "bold", L.hSubtitle);
+  darkRow(sh, row, "Global Revenue Growth & Creative Services Performance Dashboard : Real-Time Analytics", "#a4c2f4", L.fSubtitle, "bold", L.hSubtitle);
   row++;
-  var ts = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd MMM yyyy  'at'  HH:mm:ss");
+  var ts = Utilities.formatDate(new Date(), "Asia/Kolkata", "dd MMM yyyy  'at'  h:mm a") + " IST";
   darkRow(sh, row, "Last Synced : " + ts, P.tx3, L.fTimestamp, "bold", L.hTimestamp);
   row++;
   spacer(sh, row); row++;
@@ -557,7 +570,7 @@ function updateGrowthMetrics() {
   // ┌─────────────────────────────────────────────────────────────────────────┐
   // │  KPI SCORECARDS — Row 1                                                │
   // └─────────────────────────────────────────────────────────────────────────┘
-  darkRow(sh, row, "-  KEY PERFORMANCE INDICATORS  -", P.totalsYellow, L.fSection, "bold", L.hSection);
+  darkRow(sh, row, "- BUSINESS PERFORMANCE INDICATORS  -", "#39d2c0", L.fSection, "bold", L.hSection);
   row++;
   spacer(sh, row); row++;
 
@@ -567,7 +580,7 @@ function updateGrowthMetrics() {
 
   kpiCard(sh, k1a, k1l, k1v, 2,  2, P.kpiBlue,   "TOTAL SQLs",      num(A.tQ));
   kpiCard(sh, k1a, k1l, k1v, 4,  2, P.kpiGreen,  "CONVERTED",       num(A.tV));
-  kpiCard(sh, k1a, k1l, k1v, 6,  1, P.kpiPurple, "CONV. RATE",      pct(A.cr));
+  kpiCard(sh, k1a, k1l, k1v, 6,  2, P.kpiPurple, "CONV. RATE",      pct(A.cr));
   kpiCard(sh, k1a, k1l, k1v, 8,  2, P.gold,      "TOTAL REVENUE",   cur(A.tR));
   kpiCard(sh, k1a, k1l, k1v, 10, 1, P.kpiOrange, "AVG DEAL SIZE",   cur(A.ad));
   kpiCard(sh, k1a, k1l, k1v, 11, 2, P.kpiTeal,   "ANNUALISED REV",  cur(A.ar));
@@ -584,10 +597,10 @@ function updateGrowthMetrics() {
 
   kpiCard(sh, k2a, k2l, k2v, 2,  2, P.teal,    "ACTIVE MONTHS",       num(A.aM));
   kpiCard(sh, k2a, k2l, k2v, 4,  2, P.violet,  "AVG REV / MONTH",    cur(A.mr));
-  kpiCard(sh, k2a, k2l, k2v, 6,  1, P.azure,   "TOTAL SERVICES",     num(A.sA.length));
+  kpiCard(sh, k2a, k2l, k2v, 6,  2, P.azure,   "TOTAL SERVICES",     num(A.sA.length));
   kpiCard(sh, k2a, k2l, k2v, 8,  2, A.conc > 60 ? P.coral : (A.conc > 40 ? P.amber : P.emerald),
                                                  "CONCENTRATION RISK", pct(A.conc));
-  kpiCard(sh, k2a, k2l, k2v, 10, 1, P.emerald, "VELOCITY / MO",      dec(A.vel));
+  kpiCard(sh, k2a, k2l, k2v, 10, 1, P.amber, "VELOCITY / MO",      dec(A.vel));
   kpiCard(sh, k2a, k2l, k2v, 11, 2, P.azure,   "SQLs / MONTH",       dec(A.sqlV));
   kpiCard(sh, k2a, k2l, k2v, 13, 1, P.rose,    "TOP REQUIREMENT",    A.rA.length > 0 ? A.rA[0].n : "-");
 
@@ -648,7 +661,6 @@ function updateGrowthMetrics() {
       pct(dv(n.v, n.c) * 100),
       pct(dv(n.r, tNR) * 100)
     ], ni);
-    leftAlign(sh, nRow, 8);
     nRow++;
   }
   var nTC = A.nbe["NBD"].c + A.nbe["Existing"].c;
@@ -720,7 +732,7 @@ function updateGrowthMetrics() {
   // │                       RevShare | AvgR | Demand(2-col merged)            │
   // └─────────────────────────────────────────────────────────────────────────┘
   var reqNCols = 11;
-  secTitle(sh, row, 2, reqNCols, "TOP 10 REQUIREMENTS — Most Opted Creative Requirements", P.orange);
+  secTitle(sh, row, 2, reqNCols, "TOP 10 REQUIREMENTS - Most Opted Creative Requirements", P.rose);
   row++;
   tHead(sh, row, 2, ["#", "Requirement", "Service", "Volume", "Converted", "Revenue", "Conv %", "Rev Share", "Avg Rev/Conv", "Demand", ""]);
   // Merge "Demand" header across 2 columns (K+L)
@@ -749,7 +761,7 @@ function updateGrowthMetrics() {
       "", ""           // Demand sparkline (2-col merged)
     ], i);
     leftAlign(sh, row, 3);
-    sparkBar2(sh, row, 11, A.rA[i].c, maxReqCount, P.orange);  // ← 2 columns wide (K+L)
+    sparkBar2(sh, row, 11, A.rA[i].c, maxReqCount, P.rose);  // ← 2 columns wide (K+L)
     row++;
   }
   // Totals
@@ -762,7 +774,7 @@ function updateGrowthMetrics() {
     pct(dv(rTr, A.tR) * 100),
     rTv > 0 ? cur(rTr / rTv) : "$0",
     "", ""
-  ], P.orange);
+  ], P.rose);
   row++;
   gBorder(sh, rqStart - 1, 2, row - rqStart + 1, reqNCols);
 
@@ -879,7 +891,7 @@ function updateGrowthMetrics() {
   // │       AvgR | KeyReqs(2-col merged) | Geo | RevVisual(2-col merged)     │
   // └─────────────────────────────────────────────────────────────────────────┘
   var cliNCols = 12;
-  secTitle(sh, row, 2, cliNCols, "TOP 10 CLIENTS — Revenue, Conversions & Requirements", P.lemonYel);
+  secTitle(sh, row, 2, cliNCols, "TOP 10 CLIENTS - Revenue, Conversions & Requirements", P.lemonYel);
   row++;
   // Header: note "Key Requirements" spans col J, "—" is placeholder for merge into K,
   //         "Geo" at col L, "Revenue Visual" spans cols M (will merge M+… but we use sparkBar2 at L+M)
