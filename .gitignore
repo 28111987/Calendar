@@ -1,0 +1,11 @@
+# Data exports (may contain sensitive data)
+data/
+
+# Environment / secrets
+.env
+.env.*
+*.key
+
+# OS files
+.DS_Store
+Thumbs.db
